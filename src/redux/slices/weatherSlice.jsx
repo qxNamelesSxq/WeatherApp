@@ -10,7 +10,7 @@ const weatherSlice = createSlice({
   name: "weather",
   initialState,
   reducers: {
-    setCityDate: (state, action) => {
+    setCity: (state, action) => {
       state.city = action.payload;
     },
     setWeatherData: (state, action) => {

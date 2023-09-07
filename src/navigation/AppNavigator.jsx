@@ -3,7 +3,7 @@ import {
   NavigationContainer,
   DefaultTheme,
   DarkTheme,
-} from "@react-navigation/native"; // Импортируйте DefaultTheme и DarkTheme
+} from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { useSelector } from "react-redux";
 import HomeScreen from "../screens/HomeScreen";

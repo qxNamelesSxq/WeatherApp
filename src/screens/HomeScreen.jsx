@@ -20,26 +20,27 @@ import { ScrollView } from "react-native-gesture-handler";
 const HomeScreen = () => {
   const dispatch = useDispatch();
 
-  const [city, setCity] = useState("");
-  const cityRed = useSelector((state) => state.weather.city);
+  const [cityOne, setCityOne] = useState("");
+  const city = useSelector((state) => state.weather.setCity);
   const theme = useSelector((state) => state.weather.theme);
   const weatherData = useSelector((state) => state.weather.weatherData);
   const [location, setLocation] = useState("");
   const [selectedInterval, setSelectedInterval] = useState("сегодня");
   const [isLoading, setIsLoading] = useState(true);
 
-  const fetchWeatherDataByCoordinates = (city) => {
-    if (city) {
+  const fetchWeatherDataByCoordinates = (cityName) => {
+    if (cityName) {
       let days = 1; // По умолчанию запрашиваем погоду на 1 день
-
+      setCityOne(cityName);
       // Выполните запрос к API с координатами и городом для определения города и выбранным интервалом
       axios
         .get(
-          `https://api.weatherapi.com/v1/forecast.json?key=6bbd51f35ab54d55860202414230509&q=${city}&days=${days}`
+          `https://api.weatherapi.com/v1/forecast.json?key=6bbd51f35ab54d55860202414230509&q=${cityName}&days=${days}`
         )
         .then((response) => {
           const weatherData = response.data;
           dispatch(setWeatherData(weatherData));
+
           setIsLoading(false);
         })
         .catch((error) => {
@@ -61,7 +62,7 @@ const HomeScreen = () => {
 
         if (status === "granted") {
           const locationData = await Location.getCurrentPositionAsync({});
-          console.log(locationData, "data");
+
           const { latitude, longitude } = locationData.coords;
 
           let regionName = await Location.reverseGeocodeAsync({
@@ -69,10 +70,10 @@ const HomeScreen = () => {
             longitude: locationData.coords.longitude,
           });
 
-          setCity(regionName[0]?.city);
+          const cityName = regionName[0]?.city;
+          dispatch(setCity(cityName));
 
-          // Вызовите функцию fetchWeatherDataByCoordinates с координатами
-          fetchWeatherDataByCoordinates(regionName[0]?.city);
+          fetchWeatherDataByCoordinates(cityName);
         }
       } catch (error) {
         console.error("Ошибка при получении координат:", error);
@@ -91,33 +92,12 @@ const HomeScreen = () => {
     );
   }
 
-  // const fetchWeatherDataByCoordinates = (city) => {
-  //   if (city) {
-  //     // Выполните запрос к API с координатами и городом для определения города и выбранным интервалом
-  //     axios
-  //       .get(
-  //         `   https://api.weatherapi.com/v1/forecast.json?key=6bbd51f35ab54d55860202414230509&q=${city}`
-  //       )
-  //       .then((response) => {
-  //         const weatherData = response.data;
-  //         dispatch(setWeatherData(weatherData));
-  //       })
-  //       .catch((error) => {
-  //         console.error("Ошибка при получении данных о погоде:", error);
-  //       });
-  //   } else {
-  //     console.warn(
-  //       "Город не определен. Пожалуйста, дождитесь получения координат и определения города."
-  //     );
-  //   }
-  // };
-
   const handleDaysButtonClick = (days) => {
     setSelectedInterval(days);
-    // Выполните запрос к API с выбранным интервалом (3 дня) и обновите интерфейс с данными о погоде
+
     axios
       .get(
-        `https://api.weatherapi.com/v1/forecast.json?key=6bbd51f35ab54d55860202414230509&q=${city}&days=${days}`
+        `https://api.weatherapi.com/v1/forecast.json?key=6bbd51f35ab54d55860202414230509&q=${cityOne}&days=${days}`
       )
       .then((response) => {
         const weatherData = response.data;
@@ -127,32 +107,6 @@ const HomeScreen = () => {
         console.error("Ошибка при получении данных о погоде:", error);
       });
   };
-
-  // useEffect(() => {
-  //   (async () => {
-  //     try {
-  //       const { status } = await Location.requestForegroundPermissionsAsync();
-
-  //       if (status === "granted") {
-  //         const locationData = await Location.getCurrentPositionAsync({});
-  //         console.log(locationData, "data");
-  //         const { latitude, longitude } = locationData.coords;
-
-  //         let regionName = await Location.reverseGeocodeAsync({
-  //           latitude: locationData.coords.latitude,
-  //           longitude: locationData.coords.longitude,
-  //         });
-
-  //         setCity(regionName[0]?.city);
-
-  //         // Вызовите функцию fetchWeatherDataByCoordinates с координатами
-  //         fetchWeatherDataByCoordinates(regionName);
-  //       }
-  //     } catch (error) {
-  //       console.error("Ошибка при получении координат:", error);
-  //     }
-  //   })();
-  // }, []);
 
   return (
     <ScrollView style={{}}>
@@ -168,7 +122,7 @@ const HomeScreen = () => {
             color: theme === "dark" ? "white" : "black",
           }}
         >
-          Погода в {city}
+          Погода в {cityOne}
         </Text>
         <Text
           style={{
@@ -179,7 +133,6 @@ const HomeScreen = () => {
           Выбран интервал: {selectedInterval}
         </Text>
 
-        {console.log(weatherData?.forecast.forecastday[0].day.avgtemp_c, "qwe")}
         {weatherData && (
           <View>
             {weatherData.forecast.forecastday.map((forecastDay) => (
@@ -208,7 +161,6 @@ const HomeScreen = () => {
                 >
                   Описание: {forecastDay.day.condition.text}
                 </Text>
-                {/* Добавьте другие данные о погоде, которые вам необходимы для каждого дня */}
               </View>
             ))}
           </View>
@@ -247,6 +199,11 @@ const styles = StyleSheet.create({
   text: {
     fontSize: 24,
     marginBottom: 20,
+  },
+  loaderContainer: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
   },
 });
 
