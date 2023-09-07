@@ -109,7 +109,9 @@ const HomeScreen = () => {
   };
 
   return (
-    <ScrollView style={{}}>
+    <ScrollView
+      style={{ flex: 1, backgroundColor: theme === "dark" ? "black" : "white" }}
+    >
       <View
         style={{
           ...styles.container,
@@ -171,7 +173,12 @@ const HomeScreen = () => {
         <Button title="3 дня" onPress={() => handleDaysButtonClick(3)} />
         <Button title="7 дней" onPress={() => handleDaysButtonClick(7)} />
         <Button title="14 дней" onPress={() => handleDaysButtonClick(14)} />
-        <View style={{ flexDirection: "row", alignItems: "center" }}>
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+          }}
+        >
           <Text
             style={{
               ...styles.text,
@@ -192,11 +199,11 @@ const HomeScreen = () => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     alignItems: "center",
     justifyContent: "center",
   },
   text: {
+    marginTop: 15,
     fontSize: 24,
     marginBottom: 20,
   },
